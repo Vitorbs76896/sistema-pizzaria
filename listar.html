@@ -38,17 +38,24 @@
                 <button id="dashboardBtn" class="btn btn-primary">Dashboard</button>
             </div>
 
+            <!-- Modal de Visualização de Usuário -->
             <div class="modal fade" id="visualizarUsuarioModal" tabindex="-1" aria-labelledby="visualizarUsuarioModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="visualizarUsuarioModalLabel">Detalhes do Usuário</h5>
+                            <h5 class="modal-title" id="visualizarUsuarioModalLabel">Informações do Usuário</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <p><strong>Nome:</strong> <span id="usuarioNome"></span></p>
-                            <p><strong>Email:</strong> <span id="usuarioEmail"></span></p>
-                            <p><strong>Data de Criação:</strong> <span id="usuarioDataCriacao"></span></p>
+                            <div class="mb-3">
+                                <p><strong>Nome:</strong> <span id="usuarioNome" class="text-primary"></span></p>
+                            </div>
+                            <div class="mb-3">
+                                <p><strong>Email:</strong> <span id="usuarioEmail" class="text-info"></span></p>
+                            </div>
+                            <div class="mb-3">
+                                <p><strong>Data de Criação:</strong> <span id="usuarioDataCriacao" class="text-muted"></span></p>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
@@ -57,70 +64,92 @@
                 </div>
             </div>
 
-            <div class="modal fade" id="editarUsuarioModal" tabindex="-1" aria-labelledby="editarUsuarioModal" aria-hidden="true">
-                <div class="modal-dialog">
+            
+            <div class="modal fade" id="editarUsuarioModal" tabindex="-1" aria-labelledby="editarUsuarioModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="editarUsuarioModal">Editar Usuário</h5>
+                            <h5 class="modal-title" id="editarUsuarioModalLabel">Atualizar Dados do Usuário</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <p><strong>Nome:</strong> <input class="form-control" id="usuarioNomeForm"/></p>
-                            <p><strong>Email:</strong> <input class="form-control" id="usuarioEmailForm"/></p>
-                            <p><strong>Senha:</strong> <input type="password" class="form-control" id="usuarioSenhaForm"/></p>
-                            <p><strong>Confirma Senha:</strong> <input type="password" class="form-control" id="usuarioConfirmaSenhaForm"/></p>
+                            <div class="form-group mb-3">
+                                <label for="usuarioNomeForm">Nome</label>
+                                <input type="text" class="form-control" id="usuarioNomeForm" placeholder="Nome completo" />
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="usuarioEmailForm">Email</label>
+                                <input type="email" class="form-control" id="usuarioEmailForm" placeholder="email@exemplo.com" />
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="usuarioSenhaForm">Nova Senha</label>
+                                <input type="password" class="form-control" id="usuarioSenhaForm" placeholder="Senha" />
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="usuarioConfirmaSenhaForm">Confirme a Nova Senha</label>
+                                <input type="password" class="form-control" id="usuarioConfirmaSenhaForm" placeholder="Confirme a senha" />
+                                <small id="senhaErro" class="form-text text-danger d-none">As senhas não coincidem!</small>
+                            </div>
                         </div>
                         <div class="modal-footer">
-                            <input type="hidden" id="usuarioCodigoForm"/>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                            <button type="button" class="btn btn-success atualizar-usuario" data-bs-dismiss="modal">Atualizar</button>
+                            <input type="hidden" id="usuarioCodigoForm" />
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-success atualizar-usuario" onclick="verificarSenhas()" data-bs-dismiss="modal">Salvar Alterações</button>
                         </div>
                     </div>
                 </div>
             </div>
 
         </div>
+
+        <!-- Scripts -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
             crossorigin="anonymous">
         </script>
         <script src="https://kit.fontawesome.com/2c682d9b74.js" crossorigin="anonymous"></script>
         <script src="js/listar.js"></script>
+
         <script>
             document.getElementById('logoutBtn').addEventListener('click', function() {
-                // Pega o token armazenado no localStorage
                 const token = localStorage.getItem('token');
     
-                // Faz a requisição para a rota de logout no backend
                 fetch('http://localhost:8000/api/logout', {
                     method: 'POST',
                     headers: {
-                        'Authorization': 'Bearer ' + token, // Inclui o token de autenticação
+                        'Authorization': 'Bearer ' + token,
                         'Content-Type': 'application/json'
                     }
                 })
                 .then(response => {
                     if (response.ok) {
-                        // Se o logout foi bem-sucedido, limpa o localStorage
                         localStorage.clear();
-    
-                        // Redireciona o usuário para a página de login
                         window.location.href = 'login.html';
                     } else {
-                        // Se houve algum erro no logout, exibe uma mensagem
                         console.error('Erro ao deslogar');
                     }
                 })
                 .catch(error => {
-                    // Em caso de falha na requisição
                     console.error('Erro de rede ao tentar deslogar:', error);
                 });
             });
-        </script>
-        <script>
+
             document.getElementById('dashboardBtn').addEventListener('click', function() {
                 window.location.href = 'dashboard.html';
             });
+
+            function verificarSenhas() {
+                const senha = document.getElementById('usuarioSenhaForm').value;
+                const confirmaSenha = document.getElementById('usuarioConfirmaSenhaForm').value;
+                const mensagemErro = document.getElementById('senhaErro');
+
+                if (senha !== confirmaSenha) {
+                    mensagemErro.classList.remove('d-none');
+                } else {
+                    mensagemErro.classList.add('d-none');
+            
+                }
+            }
         </script>
     </body>
 </html>
